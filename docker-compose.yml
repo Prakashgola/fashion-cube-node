@@ -1,0 +1,15 @@
+version: '3.0'
+
+services:
+   cube-node:
+      container_name: cube-node
+      image: cube-node:latest 
+      restart: unless-stopped
+      ports:
+         - "3000:3000"
+
+networks:
+   default:
+      name: node-hello-network
+      external: true
+ 
