@@ -14,13 +14,8 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Set up Minikube
-        uses: kubeactions/minikube@v0.1.2
-        with:
-          minikube_version: latest
-
       - name: Set up kubectl
-        uses: kubeactions/kubectl@v0.1.2
+        uses: azure/setup-kubectl@v1
 
       - name: Set up Node.js
         uses: actions/setup-node@v2
@@ -41,7 +36,10 @@ jobs:
     needs: build
 
     steps:
+      - name: Configure kubectl context for Minikube
+        run: minikube kubectl -- get pods
+
       - name: Deploy to Minikube
         run: |
           kubectl apply -f kubernetes/deployment.yaml
-
+          
