@@ -18,7 +18,7 @@ spec:
     spec:
       containers:
         - name: cube-node
-          image: "cube-node"
+          image: "ghcr.io/prakashgola/cube-node"
           imagePullPolicy: Never
           ports:
             - containerPort: 3000
