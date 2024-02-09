@@ -1,79 +1,42 @@
 name: Node.js CI/CD with Minikube
-
 on:
-
   push:
-
     branches:
-
       - master
-
   pull_request:
-
     branches:
-
       - master
+
 
 jobs:
-
   containerize:
-
     runs-on: ubuntu-latest
-
     steps:
-
       - name: Checkout code
-
         uses: actions/checkout@v2
 
-      - name: Set up Docker Buildx
 
+      - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v1
 
-      - name: Configure Docker access (Secrets Manager recommended)
 
-        env:
+      - name: Log in to Docker registry
+        run: echo "${{ secrets.DOCKER_REGISTRY_PASSWORD }}" | docker login -u ${{ secrets.DOCKER_REGISTRY_USERNAME }} --password-stdin ${{ secrets.DOCKER_REGISTRY }}
 
-          DOCKER_USERNAME: ${{ secrets.DOCKER_REGISTRY_USERNAME }}
 
-          DOCKER_PASSWORD: ${{ secrets.DOCKER_REGISTRY_PASSWORD }}
-
+      - name: Build and push Docker image
         run: |
-
-          echo "${{ secrets.DOCKER_USERNAME }}:${{ secrets.DOCKER_PASSWORD }}" | docker login -u ${{ secrets.DOCKER_USERNAME }} --password-stdin ${{ secrets.DOCKER_REGISTRY }}
-
-
-      - name: Build and push Docker image (multi-arch)
-
-        run: |
-
           docker buildx build --push --platform linux/amd64,linux/arm64 -t ${{ secrets.DOCKER_REGISTRY }}/${{ github.repository }}:${{ github.sha }} .
 
 
   deploy:
-
     runs-on: ubuntu-latest
-
     needs: containerize
-
     steps:
-
       - name: Install kubectl
-
         uses: azure/setup-kubectl@v1
 
-      - name: Configure Kubernetes access (Minikube Service Account)
-
-        env:
-
-          KUBE_SERVICE_ACCOUNT_TOKEN: ${{ secrets.KUBE_SERVICE_ACCOUNT_TOKEN }}
-
-        run: |
-
-          export KUBE_CONTEXT=minikube
 
       - name: Deploy to Minikube
-
         run: |
-
           kubectl apply -f ./k8s/deployment.yaml
