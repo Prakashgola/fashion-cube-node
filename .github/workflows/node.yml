@@ -36,6 +36,11 @@ jobs:
       - name: Install kubectl
         uses: azure/setup-kubectl@v1
 
+      - name: Adjust permissions
+        run: |
+          ls ./k8s  # Optional: Verify the directory exists
+          chmod +r ./k8s/deployment.yaml  # Add read permission to the deployment.yaml file
+          chmod +x ./k8s  # Add execute permission to the k8s directory
 
       - name: Deploy to Minikube
         run: |
